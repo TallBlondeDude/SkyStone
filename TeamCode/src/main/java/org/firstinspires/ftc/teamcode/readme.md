@@ -35,8 +35,8 @@ The prefix of the name will be one of the following:
 * Pushbot:  This is a Sample OpMode that uses the Pushbot robot structure as a base.
 * Concept:	This is a sample OpMode that illustrates performing a specific function or concept.
             These may be complex, but their operation should be explained clearly in the comments,
-            or the header should reference an external doc, guide or tutorial.
-* Library:  This is a class, or set of classes used to implement some strategy.
+            or the header should reference an external doc, gused to implement some strategyuide or tutorial.
+* Library:  This is a class, or set of classes .
             These will typically NOT implement a full OpMode.  Instead they will be included
             by an OpMode to provide some stand-alone capability.
 
