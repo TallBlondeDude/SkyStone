@@ -16,20 +16,13 @@ public class Tele_Example extends OpMode {
         Robot = new Robot(hardwareMap.get(DcMotor.class, "frontLeftDrive"),
                 hardwareMap.get(DcMotor.class, "frontRightDrive"), hardwareMap.get(DcMotor.class,
                 "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive"), telemetry);
+        Robot.setTeleMode();
     }
 
     @Override
     public void loop() {
-        // Set the power of the motors to 1
-        Robot.backRightDrive.setPower(1);
-        Robot.frontRightDrive.setPower(1);
-        Robot.frontLeftDrive.setPower(1);
-        Robot.backLeftDrive.setPower(1);
-        // telemetry to get the encoder values
-        telemetry.addData("Front Left Encoder", Robot.frontLeftDrive.getCurrentPosition());
-        telemetry.addData("Back Left Encoder", Robot.backLeftDrive.getCurrentPosition());
-        telemetry.addData("Front Right Encoder", Robot.frontRightDrive.getCurrentPosition());
-        telemetry.addData("Back Right Encoder", Robot.backRightDrive.getCurrentPosition());
+
+        Robot.Drive(Robot.GetHeading(gamepad1.left_stick_x, gamepad1.left_stick_y), gamepad1.right_stick_x, Robot.GetMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y));
     }
 
     /*
@@ -38,9 +31,7 @@ public class Tele_Example extends OpMode {
     @Override
     public void stop() {
         // stop the motors and show the telemetry
-        telemetry.addData("Task", "Halting");
         Robot.Halt();
-        //    Servos.Halt();
     }
 
 }

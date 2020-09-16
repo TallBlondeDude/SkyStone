@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
@@ -25,9 +24,39 @@ public class Robot{
         this.telemetry = T;
     }
 
-    //for use in tele to get heading and speed
-    public void Drive(double directionInRadians, float turnInRadians, float powerInPercentage) {
 
+    public void setTeleMode() {
+        telemetry.addData("Mode", "Init for Tele");
+
+        //inits the motors in a way suitible for manual control
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public double GetHeading(double leftStickX, double leftStickY){
+        // inverse tangent, gives the angle of the point
+        double theta = Math.atan2(leftStickX, leftStickY);
+        return (theta - 1.57079);
+    }
+
+    public double GetMagnitude(double leftStickX, double leftStickY) {
+        //pretty much just pythag, figure out how far point is from center - combined the GetHeading direction and speed can be gotten
+        return (Math.sqrt(leftStickY * leftStickY + leftStickX * leftStickX));
+    }
+    //for use in tele to get heading and speed
+    public void Drive(double directionInRadians, float turnInRadians, double powerInPercentage) {
+        telemetry.addData("Mode", "Driving");
+
+        //takes input in direction, turning, and %of the max speed desired
         double wheelsSetA = Math.sin(directionInRadians - .7957) * powerInPercentage;
         double wheelsSetB = Math.sin(directionInRadians + .7957) * powerInPercentage;
         double motorCheck;
@@ -59,6 +88,7 @@ public class Robot{
 
     public void Halt(){
         //stops the wheels
+        telemetry.addData("Mode", "Stopping");
         frontLeftDrive.setPower(0);
         frontRightDrive.setPower(0);
         backRightDrive.setPower(0);
