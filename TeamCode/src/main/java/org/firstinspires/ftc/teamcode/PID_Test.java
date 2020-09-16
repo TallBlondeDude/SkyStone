@@ -7,23 +7,30 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp(name = "Basic Mech Drive", group = "Iterative Opmode")
-public class Tele_Example extends OpMode {
+@TeleOp(name = "PID_Test", group = "Iterative Opmode")
+public class PID_Test extends OpMode {
     // Declare OpMode members.
     public Robot Robot;
-
+    double loopTime;
+    double previousTime;
+    Roadrunner Roadrunner;
     public void init() {
+
         Robot = new Robot(hardwareMap.get(DcMotor.class, "frontLeftDrive"),
                 hardwareMap.get(DcMotor.class, "frontRightDrive"), hardwareMap.get(DcMotor.class,
                 "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
                 , telemetry);
-        Robot.setTeleMode();
+
+        Robot.setPIDMode();
+
     }
 
     @Override
     public void loop() {
+        loopTime = previousTime - getRuntime();
+        previousTime = getRuntime();
 
-        Robot.Drive(Robot.GetHeading(gamepad1.left_stick_x, gamepad1.left_stick_y), gamepad1.right_stick_x, Robot.GetMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y));
+
     }
 
     /*

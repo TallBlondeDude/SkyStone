@@ -1,17 +1,19 @@
 package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+import org.firstinspires.ftc.teamcode.PIDStuff.Position;
 
 public class Robot{
-
+    public Vector2d position;
     //init var
     public DcMotor frontLeftDrive;
     public DcMotor frontRightDrive;
     public DcMotor backLeftDrive;
     public DcMotor backRightDrive;
-    public Telemetry telemetry;
 
+    public Telemetry telemetry;
+    public Position Position = new Position(0,0,0);
 
     //init and declare var
     private static int maxSpeed = 1;
@@ -21,7 +23,17 @@ public class Robot{
         this.frontRightDrive = frontRightDrive;
         this.backLeftDrive = backLeftDrive;
         this.backRightDrive = backRightDrive;
+
         this.telemetry = T;
+    }
+    public Robot(DcMotor frontLeftDrive, DcMotor frontRightDrive, DcMotor backLeftDrive, DcMotor backRightDrive, Telemetry T, Position P){
+        this.frontLeftDrive = frontLeftDrive;
+        this.frontRightDrive = frontRightDrive;
+        this.backLeftDrive = backLeftDrive;
+        this.backRightDrive = backRightDrive;
+
+        this.telemetry = T;
+        this.Position = P;
     }
 
 
@@ -41,6 +53,40 @@ public class Robot{
         frontLeftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+    public void setEncoderMode() {
+        telemetry.addData("Mode", "Init for Encoder");
+
+        //inits the motors in a way suitible for manual control
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    public void setPIDMode() {
+        telemetry.addData("Mode", "Init for PID");
+
+        //inits the motors in a way suitible for manual control
+        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
+        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public double GetHeading(double leftStickX, double leftStickY){
         // inverse tangent, gives the angle of the point
@@ -88,6 +134,10 @@ public class Robot{
 
     public void Halt(){
         //stops the wheels
+        frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         telemetry.addData("Mode", "Stopping");
         frontLeftDrive.setPower(0);
         frontRightDrive.setPower(0);
