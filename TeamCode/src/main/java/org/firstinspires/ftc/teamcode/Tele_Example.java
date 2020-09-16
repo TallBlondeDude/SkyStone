@@ -13,17 +13,22 @@ public class Tele_Example extends OpMode {
     public Robot Robot;
 
     public void init() {
+        //build the robot
         Robot = new Robot(hardwareMap.get(DcMotor.class, "frontLeftDrive"),
                 hardwareMap.get(DcMotor.class, "frontRightDrive"), hardwareMap.get(DcMotor.class,
                 "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
                 , telemetry);
+        //set the robot ready for standered tele
         Robot.setTeleMode();
     }
 
     @Override
     public void loop() {
-
-        Robot.Drive(Robot.GetHeading(gamepad1.left_stick_x, gamepad1.left_stick_y), gamepad1.right_stick_x, Robot.GetMagnitude(gamepad1.left_stick_x, gamepad1.left_stick_y));
+        //read the state of the joysticks
+        double leftY = gamepad1.left_stick_y;
+        double leftX = gamepad1.left_stick_x;
+        //set the robot to drive as per the joysticks (Not using dead wheels)
+        Robot.Drive(Robot.GetHeading(leftX, leftY), gamepad1.right_stick_x, Robot.GetMagnitude(leftX, leftY));
     }
 
     /*

@@ -21,8 +21,6 @@ public class PID_Test extends OpMode {
                 "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
                 , telemetry);
 
-        Robot.setPIDMode();
-
     }
 
     @Override
