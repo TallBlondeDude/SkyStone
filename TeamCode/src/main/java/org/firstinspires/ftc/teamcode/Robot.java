@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.PIDStuff.Position;
 
 public class Robot{
     public Vector2d position;
@@ -13,7 +12,6 @@ public class Robot{
     public DcMotor backRightDrive;
 
     public Telemetry telemetry;
-    public Position Position = new Position(0,0,0);
 
     //init and declare var
     private static int maxSpeed = 1;
@@ -25,15 +23,6 @@ public class Robot{
         this.backRightDrive = backRightDrive;
 
         this.telemetry = T;
-    }
-    public Robot(DcMotor frontLeftDrive, DcMotor frontRightDrive, DcMotor backLeftDrive, DcMotor backRightDrive, Telemetry T, Position P){
-        this.frontLeftDrive = frontLeftDrive;
-        this.frontRightDrive = frontRightDrive;
-        this.backLeftDrive = backLeftDrive;
-        this.backRightDrive = backRightDrive;
-
-        this.telemetry = T;
-        this.Position = P;
     }
 
 
