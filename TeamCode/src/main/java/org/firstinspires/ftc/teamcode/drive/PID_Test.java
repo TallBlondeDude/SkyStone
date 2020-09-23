@@ -1,19 +1,18 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Robot;
 
 @TeleOp(name = "PID_Test", group = "Iterative Opmode")
 public class PID_Test extends OpMode {
     // Declare OpMode members.
-    public Robot Robot;
+    public org.firstinspires.ftc.teamcode.Robot Robot;
     double loopTime;
     double previousTime;
-    Roadrunner Roadrunner;
+    org.firstinspires.ftc.teamcode.drive.Roadrunner Roadrunner;
     public void init() {
 
         Robot = new Robot(hardwareMap.get(DcMotor.class, "frontLeftDrive"),
