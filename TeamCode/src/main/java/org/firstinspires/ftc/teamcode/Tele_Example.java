@@ -2,22 +2,23 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name = "Basic Mech Drive", group = "Iterative Opmode")
 public class Tele_Example extends OpMode {
     // Declare OpMode members.
     public Robot Robot;
-
+    private double mode = 1;
     public void init() {
         //build the robot
-        Robot = new Robot(hardwareMap.get(DcMotor.class, "frontLeftDrive"),
+        Robot = new Robot(hardwareMap.get(Servo.class, "wobbleGrip"),
+                hardwareMap.get(DcMotor.class, "wobbleMotor"),
+                hardwareMap.get(DcMotor.class, "frontLeftDrive"),
                 hardwareMap.get(DcMotor.class, "frontRightDrive"), hardwareMap.get(DcMotor.class,
                 "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
-                , telemetry);
+                , hardwareMap.get(ColorSensor.class, "Color"), telemetry);
         //set the robot ready for standered tele
         Robot.setTeleMode();
     }
@@ -28,7 +29,69 @@ public class Tele_Example extends OpMode {
         double leftY = gamepad1.left_stick_y;
         double leftX = gamepad1.left_stick_x;
         //set the robot to drive as per the joysticks (Not using dead wheels)
-        Robot.Drive(Robot.GetHeading(leftX, leftY), gamepad1.right_stick_x, Robot.GetMagnitude(leftX, leftY));
+        Robot.Drive(Robot.GetHeading(leftX, leftY), gamepad1.right_stick_x, mode * Robot.GetMagnitude(leftX, leftY));
+        // Push Ring into Launcher on right bumper
+        telemetry.addData("Power", mode *  Robot.GetMagnitude(leftX, leftY));
+        // somthing like
+        /*
+        if(gamepad1.right_bumper){
+            //do the ring
+        }
+
+         */
+        // Start Launcher on Left Bumper
+       if(gamepad1.left_bumper){
+        Robot.raiseWobbleArm();
+       }
+
+
+        // Stop Launcher on A
+        if(gamepad1.right_bumper){
+        Robot.lowerWobbleArm();
+        }
+
+
+        // Slow Mode on Left Trigger
+        if(gamepad1.left_trigger > .4){
+            mode = .5;
+        }
+        else{
+            mode = 1;
+        }
+        // CONTROLLER TWO
+
+        // Start Intake on X
+    /*    if(gamepad2.x){
+            intake.setPower(.6);
+        }
+
+     */
+        // Stop Intake on B
+    /*    if(gamepad2.b){
+            intake.setPower(0);
+        }
+
+     */
+        // Inverse Intake on A
+     /*   if(gamepad2.a){
+            intake.setPower(-1);
+        }
+
+      */
+        // Raise Lower Wobble Goal lifter on left joystick Y Cord
+     //   wobbleLifter.setPower(gamepad1.left_stick_y);
+        // Close Wobble goal lifter on Right Bumper
+        if(gamepad1.dpad_left){
+            Robot.closeWobbleGrip();
+        }
+        // Open wobble goal grabber on left bumper
+        if(gamepad1.dpad_right){
+            Robot.openWobbleGrip();
+        }
+
+
+
+
     }
 
     /*
