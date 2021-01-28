@@ -49,7 +49,8 @@ public class Robot{
     }
 
     public double inchesToTicks(double inches){
-        return ((inches/3.9) * 537.6);
+        // returns the inches * ticks per rotation / wheel circ
+        return ((inches/12.25) * 537.6);
 
     }
     public void encoderDriveInches(double inches){
@@ -67,8 +68,16 @@ public class Robot{
             return false;
         }
     }
-
+    public void encoderCrabwalkInches(double inches){
+        //turn the robot a certain amount of inches, + = left hand turn
+        int ticks = (int) inchesToTicks(inches);
+        backLeftDrive.setTargetPosition(backLeftDrive.getCurrentPosition() - ticks);
+        frontLeftDrive.setTargetPosition(frontLeftDrive.getCurrentPosition() + ticks);
+        frontRightDrive.setTargetPosition(frontRightDrive.getCurrentPosition() - ticks);
+        backRightDrive.setTargetPosition(backRightDrive.getCurrentPosition() + ticks);
+    }
     public void encoderTurnInches(double inches){
+        //turn the robot a certain amount of inches, + = left hand turn
         int ticks = (int) inchesToTicks(inches);
         backLeftDrive.setTargetPosition(backLeftDrive.getCurrentPosition() - ticks);
         frontLeftDrive.setTargetPosition(frontLeftDrive.getCurrentPosition() - ticks);
@@ -91,10 +100,10 @@ public class Robot{
         telemetry.addData("Mode", "Init for Tele");
 
         //inits the motors in a way suitible for manual control
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -118,29 +127,30 @@ public class Robot{
         vuforia.enableConvertFrameToBitmap();
         int tfodMonitorViewId = tfodid;
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.minResultConfidence = 0.69f;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
         if (tfod != null) {
             tfod.activate();
-            tfod.setZoom(2.5, 16.0/9.0);
         }
     }
 
     public void setWheelPower(double power){
+        // sets the 4 drive trains to a certain power between 0 - 1
         backLeftDrive.setPower(power);
         frontLeftDrive.setPower(power);
         frontRightDrive.setPower(power);
         backRightDrive.setPower(power);
     }
     public void setEncoderMode() {
+        //sets the drivetrain in a drive to position mode
         telemetry.addData("Mode", "Init for Encoder");
 
         //inits the motors in a way suitible for manual control
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -166,13 +176,14 @@ public class Robot{
         wobbleMotor.setDirection(DcMotor.Direction.FORWARD);
     }
     public void setPIDMode() {
+        //sets the drive train in a mode for PID
         telemetry.addData("Mode", "Init for PID");
 
         //inits the motors in a way suitible for manual control
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
+        backRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        frontRightDrive.setDirection(DcMotor.Direction.REVERSE);
+        backLeftDrive.setDirection(DcMotor.Direction.FORWARD);
+        frontLeftDrive.setDirection(DcMotor.Direction.FORWARD);
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -185,6 +196,7 @@ public class Robot{
         wobbleMotor.setDirection(DcMotor.Direction.FORWARD);
     }
     public String getRingStack(){
+        //returns the stack of the ring only this doesnt work so IGNORE FOR NOW
         int onestack = 0;
         int quadstack = 0;
         for (int b = 0; b < tfod.getRecognitions().size(); b ++){
@@ -213,13 +225,13 @@ public class Robot{
         double theta = Math.atan2(leftStickX, leftStickY);
         return (theta - 1.57079);
     }
-
     public double GetMagnitude(double leftStickX, double leftStickY) {
         //pretty much just pythag, figure out how far point is from center - combined the GetHeading direction and speed can be gotten
         return (Math.sqrt(leftStickY * leftStickY + leftStickX * leftStickX));
     }
     //for use in tele to get heading and speed
     public void Drive(double directionInRadians, float turnInRadians, double powerInPercentage) {
+        // drives the motors via speed control. Takes a direction in radians (use getHeading()), the turn between -1 and 1, and the power (between 0-1)
         telemetry.addData("Mode", "Driving");
 
         //takes input in direction, turning, and %of the max speed desired
@@ -253,7 +265,6 @@ public class Robot{
         telemetry.addData("turning", turnInRadians);
         telemetry.addData("power in percentage", powerInPercentage);
     }
-
     public void Halt(){
         //stops the wheels
         frontRightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

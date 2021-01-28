@@ -24,110 +24,132 @@ public class placeWobbleCamera extends LinearOpMode {
     Boolean doTurn = false;
 
     public void runOpMode() {
-           Robot = new Robot(hardwareMap.get(Servo.class, "wobbleGrip"),
-                   hardwareMap.get(DcMotor.class, "wobbleMotor"),
-                   hardwareMap.get(DcMotor.class, "frontLeftDrive"),
-                   hardwareMap.get(DcMotor.class, "frontRightDrive"), hardwareMap.get(DcMotor.class,
-                   "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
-                   , hardwareMap.get(ColorSensor.class, "Color"), telemetry);
+        Robot = new Robot(hardwareMap.get(Servo.class, "wobbleGrip"),
+                hardwareMap.get(DcMotor.class, "wobbleMotor"),
+                hardwareMap.get(DcMotor.class, "frontLeftDrive"),
+                hardwareMap.get(DcMotor.class, "frontRightDrive"), hardwareMap.get(DcMotor.class,
+                "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
+                , hardwareMap.get(ColorSensor.class, "Color"), telemetry);
+        List<Recognition> Recog = null;
 
-           //set the robot for the right mode
-           Robot.setEncoderMode();
-           Robot.setWheelPower(.7);
-           if(hardwareMap.get(WebcamName.class, "Webcam 1").isAttached()) {
-               Robot.initWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()), hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName()));
-           }
-           else{
-               telemetry.addData("camera null", "ur dumb00");
-           }
-           waitForStart();
-           sleep(2000);
-           List<Recognition> Recog = Robot.tfod.getUpdatedRecognitions();
+        //set the robot for the right mode
+        Robot.setEncoderMode();
+        Robot.setWheelPower(.7);
 
-           if(Recog.size() < 1){
-               zoneNumber = 1;
-           }
-           else if(Recog.get(0).getLabel().equals("Single")){
-               zoneNumber = 2;
-           }
-
-           else {
-
-               zoneNumber = 3;
-           }
-           telemetry.addData("Found", Recog.get(0).getLabel());
-           telemetry.addData("Zone", zoneNumber);
-           telemetry.update();
-           //branch the pathes
-            if(zoneNumber == 1){
-                fowardInches = 72;
-                turnInches = 2;
-                endDirection = 1;
+        if (hardwareMap.get(WebcamName.class, "Webcam 1").isAttached()) {
+            Robot.initWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()), hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName()));
+        } else {
+            telemetry.addData("camera null", "ur dumb00");
+        }
+        waitForStart();
+        Robot.wobbleMotor.setTargetPosition(Robot.wobbleMotor.getCurrentPosition());
+        Robot.wobbleMotor.setPower(1);
+        Robot.wobbleMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        Robot.closeWobbleGrip();
+        Robot.encoderDriveInches(10);
+        while (Robot.isWheelsBusy()) {
+        }
+        sleep(2000);
+        Recog = Robot.tfod.getUpdatedRecognitions();
+        if(!Recog.isEmpty()) {
+            telemetry.addData("Found", Recog.get(0).getLabel());
+            telemetry.update();
+            if (Recog.get(0).getLabel().equals("Single")) {
+                zoneNumber = 2;
             }
-
-            else if(zoneNumber == 2){
-                fowardInches = 108;
-                doTurn = true;
-                endDirection = 1;
-
-                turnInches = Robot.nintydegreeturninches;
+            if (Recog.get(0).getLabel().equals("Quad")) {
+                zoneNumber = 3;
             }
+        }
+        else{
+            zoneNumber = 1;
+        }
 
-            else{
-                fowardInches = 120;
-                turnInches = 2;
-                endDirection = -1;
+        telemetry.addData("Zone", zoneNumber);
+        telemetry.update();
+        Robot.encoderCrabwalkInches(20);
+        while (Robot.isWheelsBusy()) {
+        }
+        //branch the pathes
+        if (zoneNumber == 1) {
+            fowardInches = 46;
+            turnInches = 2;
+            endDirection = 1;
+        }
+        else if (zoneNumber == 2) {
+            fowardInches = 85;
+            doTurn = true;
+            endDirection = 1;
 
+            turnInches = Robot.nintydegreeturninches;
+        } else {
+            fowardInches = 110;
+            turnInches = 2;
+            endDirection = -1;
+
+        }
+        Robot.encoderDriveInches(fowardInches/4);
+        while (Robot.isWheelsBusy()) {
+        }
+        if(zoneNumber != 1){
+            Robot.encoderTurnInches(4.75);
+            while (Robot.isWheelsBusy()) {
             }
-            Robot.encoderDriveInches(fowardInches);
-            while(Robot.isWheelsBusy()){}
-            sleep(300);
+        }
+        else{
+            Robot.encoderTurnInches(1);
+            while (Robot.isWheelsBusy()) {
+            }
+        }
+        Robot.encoderDriveInches(3 * fowardInches/4);
+        while (Robot.isWheelsBusy()) {
+        }
+        sleep(300);
+        Robot.encoderTurnInches(turnInches);
+        while (Robot.isWheelsBusy()) {
+        }
+        sleep(300);
+        Robot.wobbleMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        Robot.lowerWobbleArm();
+        sleep(600);
+        Robot.wobbleMotor.setPower(0);
+        Robot.openWobbleGrip();
+        sleep(300);
+        Robot.raiseWobbleArm();
+        sleep(800);
+        Robot.wobbleMotor.setPower(0);
+        if (zoneNumber == 2) {
             Robot.encoderTurnInches(turnInches);
-            while(Robot.isWheelsBusy()){}
-            sleep(300);
-            Robot.lowerWobbleArm();
-            sleep(600);
-            Robot.wobbleMotor.setPower(0);
-            Robot.openWobbleGrip();
-            sleep(300);
-            Robot.raiseWobbleArm();
-            sleep(800);
-            Robot.wobbleMotor.setPower(0);
-            if(zoneNumber == 2){
-                Robot.encoderTurnInches(turnInches);
-                while(Robot.isWheelsBusy()){}
+            while (Robot.isWheelsBusy()) {
             }
-            else if(zoneNumber == 3){
-                Robot.encoderTurnInches(-turnInches);
-                while(Robot.isWheelsBusy()){}
+        } else if (zoneNumber == 3) {
+            Robot.encoderTurnInches(-turnInches);
+            while (Robot.isWheelsBusy()) {
             }
-            else {
-                Robot.encoderTurnInches(Robot.nintydegreeturninches);
-                while(Robot.isWheelsBusy()){}
-            }
-            sleep(400);
-            if(zoneNumber == 1){
-                Robot.encoderTurnInches(-Robot.nintydegreeturninches);
-                while(Robot.isWheelsBusy()){}
-                sleep(300);
-                Robot.encoderDriveInches(36);
-                while(Robot.isWheelsBusy()){}
-                Robot.encoderTurnInches(Robot.nintydegreeturninches);
-                while(Robot.isWheelsBusy()){}
-                sleep(300);
-            }
-            Robot.setTeleMode();
-            Robot.Drive((double) endDirection * 3.1415/2, 0, .6);
+        } else {
+            Robot.encoderDriveInches(-10);
+            while (Robot.isWheelsBusy()){
 
-            while(Robot.Color.blue() < 700 && opModeIsActive()){
             }
-            Robot.Drive((double) endDirection * -3.1415/2, 0, .5);
-            sleep(300);
-             Robot.Halt();
+            Robot.encoderTurnInches(12);
+            while (Robot.isWheelsBusy()) {
+            }
+        }
+        sleep(400);
+
+        Robot.setTeleMode();
+        Robot.Drive((double) endDirection * 3.1415 / 2, 0, .6);
+
+        while (Robot.Color.blue() < 700 && opModeIsActive()) {
+        }
+        Robot.Drive((double) endDirection * -3.1415 / 2, 0, .5);
+        sleep(300);
+        Robot.Halt();
 
         // figure out how tall the stuff is i guess
-          Robot.tfod.shutdown();
+        Robot.tfod.shutdown();
 
-           stop();
+        stop();
     }
 }

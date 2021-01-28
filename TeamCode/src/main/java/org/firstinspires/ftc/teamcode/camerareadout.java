@@ -6,8 +6,10 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Color Read Out", group = "Iterative Opmode")
-public class colorreadout extends OpMode {
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
+@TeleOp(name = "Camera Read Out", group = "Iterative Opmode")
+public class camerareadout extends OpMode {
     // Declare OpMode members.
     public Robot Robot;
     private double mode = 1;
@@ -22,6 +24,7 @@ public class colorreadout extends OpMode {
                 , hardwareMap.get(ColorSensor.class, "Color"), telemetry);
         //set the robot ready for standered tele
         Robot.setTeleMode();
+        Robot.initWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName()), hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName()));
     }
 
     @Override

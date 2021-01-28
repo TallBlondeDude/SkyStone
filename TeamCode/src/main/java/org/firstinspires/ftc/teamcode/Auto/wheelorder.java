@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.Robot;
 
-@Autonomous(name = "Drive to Line", group = "Linear Opmode")
-public class toLineColor extends LinearOpMode {
+@Autonomous(name = "wheel tuner", group = "Linear Opmode")
+public class wheelorder extends LinearOpMode {
     // Declare OpMode members.
     public Robot Robot;
     private double mode = 1;
@@ -18,7 +18,6 @@ public class toLineColor extends LinearOpMode {
 
     public void runOpMode() {
         //build the robot
-
         Robot = new Robot(hardwareMap.get(Servo.class, "wobbleGrip"),
                 hardwareMap.get(DcMotor.class, "wobbleMotor"),
                 hardwareMap.get(DcMotor.class, "frontLeftDrive"),
@@ -29,16 +28,17 @@ public class toLineColor extends LinearOpMode {
         //set the robot for the right mode
         Robot.setTeleMode();
         waitForStart();
-        Robot.Drive((double) 3.1415/2, 0, .6);
-        sleep(5000);
-        Robot.Drive((double) -3.1415/2, 0, .6);
-        sleep(1000);
-        while(Robot.Color.blue() < 700 && opModeIsActive()){
-        }
-        Robot.Drive((double) 3.1415/2, 0, .5);
-        sleep(300);
-
-        Robot.Halt();
+        Robot.frontLeftDrive.setPower(.5);
+        sleep(2000);
+        Robot.frontLeftDrive.setPower(0);
+        Robot.backLeftDrive.setPower(.5);
+        sleep(2000);
+        Robot.frontRightDrive.setPower(.5);
+        Robot.backLeftDrive.setPower(0);
+        sleep(2000);
+        Robot.frontRightDrive.setPower(0);
+        Robot.backRightDrive.setPower(.5);
+        sleep(2000);
 
         stop();
     }
