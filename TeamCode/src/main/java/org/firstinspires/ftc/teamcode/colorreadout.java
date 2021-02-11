@@ -21,7 +21,7 @@ public class colorreadout extends OpMode {
                 "backLeftDrive"), hardwareMap.get(DcMotor.class, "backRightDrive")
                 , hardwareMap.get(ColorSensor.class, "Color"), telemetry);
         //set the robot ready for standered tele
-        Robot.setTeleMode();
+        Robot.setPIDMode();
     }
 
     @Override

@@ -27,16 +27,11 @@ public class toLineColor extends LinearOpMode {
                 , hardwareMap.get(ColorSensor.class, "Color"), telemetry);
 
         //set the robot for the right mode
-        Robot.setTeleMode();
+        Robot.setEncoderMode();
         waitForStart();
-        Robot.Drive((double) 3.1415/2, 0, .6);
-        sleep(5000);
-        Robot.Drive((double) -3.1415/2, 0, .6);
-        sleep(1000);
-        while(Robot.Color.blue() < 700 && opModeIsActive()){
-        }
-        Robot.Drive((double) 3.1415/2, 0, .5);
-        sleep(300);
+        Robot.setWheelPower(.8);
+        Robot.encoderDriveInches(24 * 3); //3 tiles
+        while(Robot.isWheelsBusy()){}
 
         Robot.Halt();
 

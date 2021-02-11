@@ -2,14 +2,20 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraCaptureRequest;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.tensorflow.lite.Interpreter;
+
+import java.io.File;
 
 public class Robot{
   //  public Vector2d position;
@@ -26,6 +32,7 @@ public class Robot{
     private final double wheelSizeMM = 100;
     public Telemetry telemetry;
     public Servo wobbleGrip;
+    private File modelFile = new File("model.tflite")
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
@@ -50,11 +57,11 @@ public class Robot{
 
     public double inchesToTicks(double inches){
         // returns the inches * ticks per rotation / wheel circ
-        return ((inches/12.25) * 537.6);
+        return ((inches/12.25) * 537.6 / .5);
 
     }
     public void encoderDriveInches(double inches){
-        int ticks = (int) inchesToTicks(inches);
+        int ticks = (int) -inchesToTicks(inches);
         backLeftDrive.setTargetPosition(backLeftDrive.getCurrentPosition() + ticks);
         frontLeftDrive.setTargetPosition(frontLeftDrive.getCurrentPosition() + ticks);
         frontRightDrive.setTargetPosition(frontRightDrive.getCurrentPosition() + ticks);
@@ -70,7 +77,7 @@ public class Robot{
     }
     public void encoderCrabwalkInches(double inches){
         //turn the robot a certain amount of inches, + = left hand turn
-        int ticks = (int) inchesToTicks(inches);
+        int ticks = (int) -inchesToTicks(inches);
         backLeftDrive.setTargetPosition(backLeftDrive.getCurrentPosition() - ticks);
         frontLeftDrive.setTargetPosition(frontLeftDrive.getCurrentPosition() + ticks);
         frontRightDrive.setTargetPosition(frontRightDrive.getCurrentPosition() - ticks);
@@ -78,7 +85,7 @@ public class Robot{
     }
     public void encoderTurnInches(double inches){
         //turn the robot a certain amount of inches, + = left hand turn
-        int ticks = (int) inchesToTicks(inches);
+        int ticks = (int) -inchesToTicks(inches);
         backLeftDrive.setTargetPosition(backLeftDrive.getCurrentPosition() - ticks);
         frontLeftDrive.setTargetPosition(frontLeftDrive.getCurrentPosition() - ticks);
         frontRightDrive.setTargetPosition(frontRightDrive.getCurrentPosition() + ticks);
@@ -135,6 +142,13 @@ public class Robot{
         }
     }
 
+    public String retunRingsNew(){
+        Interpreter Interpreter = new Interpreter(modelFile);
+        float[] results = new float[3];
+        CameraCaptureRequest
+        Interpreter.run(picture, results );
+        Interpreter.close();
+    }
     public void setWheelPower(double power){
         // sets the 4 drive trains to a certain power between 0 - 1
         backLeftDrive.setPower(power);
@@ -223,7 +237,7 @@ public class Robot{
     public double GetHeading(double leftStickX, double leftStickY){
         // inverse tangent, gives the angle of the point
         double theta = Math.atan2(leftStickX, leftStickY);
-        return (theta - 1.57079);
+        return (theta + 3.1415/2);
     }
     public double GetMagnitude(double leftStickX, double leftStickY) {
         //pretty much just pythag, figure out how far point is from center - combined the GetHeading direction and speed can be gotten
@@ -238,8 +252,9 @@ public class Robot{
         double wheelsSetA = Math.sin(directionInRadians - .7957) * powerInPercentage;
         double wheelsSetB = Math.sin(directionInRadians + .7957) * powerInPercentage;
         double motorCheck;
+        float turn = turnInRadians * -1;
         //checks if one of the wheel sets is > 100% power, if so reduce it to one, and reduce the other by the same factor
-        double[] powers = {wheelsSetA + turnInRadians, wheelsSetA - turnInRadians, wheelsSetB + turnInRadians, wheelsSetB - turnInRadians};
+        double[] powers = {wheelsSetA + turn, wheelsSetA - turn, wheelsSetB + turn, wheelsSetB - turn};
         double largestSpeedSoFar = powers[0];
 
         for (int i = 1; i < 4; i++) {
